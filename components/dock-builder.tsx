@@ -17,7 +17,7 @@ import {
   sortableKeyboardCoordinates,
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { MacOSDock } from '@/components/ui/shadcn-io/mac-os-dock';
+import { MacOSDock, type DockAppearance } from '@/components/ui/shadcn-io/mac-os-dock';
 import { SortableAppItem } from '@/components/sortable-app-item';
 import { AppSelector } from '@/components/app-selector';
 import { ExportMenu } from '@/components/export-menu';
@@ -35,6 +35,7 @@ export function DockBuilder() {
   const [allAppsOpen, setAllAppsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<Theme>(defaultTheme);
+  const [dockAppearance, setDockAppearance] = useState<DockAppearance>('dark');
   const dockPreviewRef = useRef<HTMLDivElement>(null);
   const dndContextId = useId();
 
@@ -106,6 +107,10 @@ export function DockBuilder() {
       });
     }
   }, [apps]);
+
+  const handleToggleDockAppearance = useCallback((light: boolean) => {
+    setDockAppearance(light ? 'light' : 'dark');
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -223,6 +228,22 @@ export function DockBuilder() {
                     />
                     {/* Separator */}
                     <div className="mr-2 h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
+                    {/* Dock Appearance Switch */}
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <Switch
+                        id="dock-appearance"
+                        checked={dockAppearance === 'light'}
+                        onCheckedChange={handleToggleDockAppearance}
+                      />
+                      <label
+                        htmlFor="dock-appearance"
+                        className="text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400 cursor-pointer whitespace-nowrap"
+                      >
+                        Light Dock
+                      </label>
+                    </div>
+                    {/* Separator */}
+                    <div className="mr-2 h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
                     {/* Open All Apps Switch */}
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       <Switch
@@ -257,6 +278,7 @@ export function DockBuilder() {
                     apps={apps}
                     onAppClick={handleAppClick}
                     openApps={openApps}
+                    appearance={dockAppearance}
                   />
                 ) : (
                   <div className="flex h-20 items-center justify-center rounded-2xl bg-zinc-800/50 px-8 backdrop-blur-md">

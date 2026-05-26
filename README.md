@@ -20,6 +20,7 @@
 - **🖱️ Drag & Drop** — Reorder apps with smooth drag and drop
 - **📱 Popular Apps** — Pre-loaded with popular macOS app icons
 - **🔗 Custom Icons** — Add any app via image URL
+- **🌓 Light/Dark Dock** — Switch between dark dock chrome and a light frosted-glass style
 - **💡 Open Indicators** — Toggle "open" dots under apps
 - **📤 Multiple Export Options** — PNG, SVG, or copy to clipboard
 - **📐 Size Options** — Export at 2x, 4x, or 6x resolution

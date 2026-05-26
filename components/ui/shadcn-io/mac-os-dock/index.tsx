@@ -9,11 +9,14 @@ interface DockApp {
   icon: string;
 }
 
+type DockAppearance = 'dark' | 'light';
+
 interface MacOSDockProps {
   apps: DockApp[];
   onAppClick: (appId: string) => void;
   openApps?: string[];
   className?: string;
+  appearance?: DockAppearance;
 }
 
 // Default config used for SSR and initial render
@@ -23,7 +26,8 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
   apps, 
   onAppClick, 
   openApps = [],
-  className = ''
+  className = '',
+  appearance = 'dark'
 }) => {
   const [mounted, setMounted] = useState(false);
   const [mouseX, setMouseX] = useState<number | null>(null);
@@ -237,24 +241,45 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
     : (apps.length * (baseIconSize + baseSpacing)) - baseSpacing;
 
   const padding = Math.max(8, baseIconSize * 0.12);
+  const isLightAppearance = appearance === 'light';
+  const dockStyle: React.CSSProperties = {
+    width: `${contentWidth + padding * 2}px`,
+    borderRadius: `${Math.max(12, baseIconSize * 0.4)}px`,
+    padding: `${padding}px`,
+    ...(isLightAppearance
+      ? {
+          background: `
+            linear-gradient(135deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.42) 46%, rgba(255, 255, 255, 0.26) 100%),
+            radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0) 38%),
+            rgba(255, 255, 255, 0.34)
+          `,
+          border: '1px solid rgba(255, 255, 255, 0.72)',
+          boxShadow: `
+            0 ${Math.max(8, baseIconSize * 0.16)}px ${Math.max(28, baseIconSize * 0.5)}px rgba(31, 41, 55, 0.18),
+            0 ${Math.max(2, baseIconSize * 0.05)}px ${Math.max(10, baseIconSize * 0.18)}px rgba(255, 255, 255, 0.44),
+            inset 0 1px 0 rgba(255, 255, 255, 0.95),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.32)
+          `,
+          backdropFilter: 'saturate(180%) blur(28px)',
+          WebkitBackdropFilter: 'saturate(180%) blur(28px)',
+        }
+      : {
+          background: 'rgba(45, 45, 45, 0.75)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          boxShadow: `
+            0 ${Math.max(4, baseIconSize * 0.1)}px ${Math.max(16, baseIconSize * 0.4)}px rgba(0, 0, 0, 0.4),
+            0 ${Math.max(2, baseIconSize * 0.05)}px ${Math.max(8, baseIconSize * 0.2)}px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.2)
+          `,
+        }),
+  };
 
   return (
     <div 
       ref={dockRef}
       className={cn('backdrop-blur-md', className)}
-      style={{
-        width: `${contentWidth + padding * 2}px`,
-        background: 'rgba(45, 45, 45, 0.75)',
-        borderRadius: `${Math.max(12, baseIconSize * 0.4)}px`,
-        border: '1px solid rgba(255, 255, 255, 0.15)',
-        boxShadow: `
-          0 ${Math.max(4, baseIconSize * 0.1)}px ${Math.max(16, baseIconSize * 0.4)}px rgba(0, 0, 0, 0.4),
-          0 ${Math.max(2, baseIconSize * 0.05)}px ${Math.max(8, baseIconSize * 0.2)}px rgba(0, 0, 0, 0.3),
-          inset 0 1px 0 rgba(255, 255, 255, 0.15),
-          inset 0 -1px 0 rgba(0, 0, 0, 0.2)
-        `,
-        padding: `${padding}px`
-      }}
+      style={dockStyle}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
@@ -298,7 +323,7 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
                 height={Math.round(scaledSize)}
                 className="object-contain"
                 style={{
-                  filter: `drop-shadow(0 ${scale > 1.2 ? Math.max(2, baseIconSize * 0.05) : Math.max(1, baseIconSize * 0.03)}px ${scale > 1.2 ? Math.max(4, baseIconSize * 0.1) : Math.max(2, baseIconSize * 0.06)}px rgba(0,0,0,${0.2 + (scale - 1) * 0.15}))`
+                  filter: `drop-shadow(0 ${scale > 1.2 ? Math.max(2, baseIconSize * 0.05) : Math.max(1, baseIconSize * 0.03)}px ${scale > 1.2 ? Math.max(4, baseIconSize * 0.1) : Math.max(2, baseIconSize * 0.06)}px rgba(0,0,0,${isLightAppearance ? 0.16 + (scale - 1) * 0.12 : 0.2 + (scale - 1) * 0.15}))`
                 }}
               />
               
@@ -312,8 +337,8 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
                     width: `${Math.max(3, baseIconSize * 0.06)}px`,
                     height: `${Math.max(3, baseIconSize * 0.06)}px`,
                     borderRadius: '50%',
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    boxShadow: '0 0 4px rgba(0, 0, 0, 0.3)',
+                    backgroundColor: isLightAppearance ? 'rgba(31, 41, 55, 0.62)' : 'rgba(255, 255, 255, 0.8)',
+                    boxShadow: isLightAppearance ? '0 0 4px rgba(255, 255, 255, 0.7)' : '0 0 4px rgba(0, 0, 0, 0.3)',
                   }}
                 />
               )}
@@ -325,4 +350,4 @@ const MacOSDock: React.FC<MacOSDockProps> = ({
   );
 };
 
-export { MacOSDock, type DockApp, type MacOSDockProps };
+export { MacOSDock, type DockApp, type DockAppearance, type MacOSDockProps };
